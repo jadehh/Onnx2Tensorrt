@@ -38,7 +38,7 @@ def build_engine(args):
         print(line)
     if args.key:
         os.remove(args.onnx)
-        encryption_model(os.path.join(save_dir,save_name))
+        encryption_model(os.path.join(save_dir,save_name),key=args.key)
         os.remove(os.path.join(save_dir,save_name))
 
 def main(args):
