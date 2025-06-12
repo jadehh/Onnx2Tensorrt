@@ -23,7 +23,7 @@ docker run -it --name tensorrt --gpus=all -v /usr/lib/x86_64-linux-gnu/libnvcuvi
 
 ```bash
 ./onnx2trt \
-         --key="0QwFRuqX1lWsywK7M_ntq-cOnXvlsawbIFoFYGZqwRA=" \
+         --key="key" \
          --onnx=../../../model_en.onnx \
          --fp16 \
          --tacticSources="+cublas,-cublasLt"
