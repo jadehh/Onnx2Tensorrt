@@ -16,7 +16,6 @@ def build_engine(args):
     save_name = ( GetLastDir(args.onnx).split('.')[0] + '.engine' ).replace("_en","")
     save_dir = GetPreviousDir(args.onnx)
     if args.key:
-        print(args.key.encode("utf-8"))
         print("正在解密ONNX模型...")
         try:
             args.onnx = decryption_model(args.onnx,key=args.key)
