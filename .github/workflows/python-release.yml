@@ -1,0 +1,68 @@
+name: Onnx2Tensorrt
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  release:
+    name: ${{ matrix.os }} 创建Release
+    runs-on:  ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ "ubuntu-latest" ] #, "macos-latest", "windows-latest"
+    steps:
+      - name: 克隆代码
+        uses: actions/checkout@v3
+      - name: 创建发行版本
+        continue-on-error: true
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          body_path: CONTRIBUTING.md
+          draft: false
+          prerelease: false
+  Py38:
+    name: 打包发布-操作系统版本:(${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    container:
+      image: jadehh/python:3.8.16-ubuntu18.04
+      options: --privileged
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ "ubuntu-latest" ] # "ubuntu-18.04", "windows-latest","macos-latest"
+    steps:
+      - name: 下载代码
+        uses: actions/checkout@v3
+        with:
+          repository: jadehh/OpencvCapture
+          ref: main
+          path: code
+          token: ${{ secrets.GH_PAT }} # `GH_PAT` is a secret that contains your PAT
+      - name: 准备打包环境
+        run: |
+          pip install -r code/requirements.txt
+      - name: 编译打包
+        run: |
+          cd code
+          python packing.py --full True  --app_name onnx2trt
+      - name: 测试是否打包完成
+        run: |
+          cd code/Output
+          ls
+      # 发布
+      - name: 发布
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files:
+            "./code/Output/*"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }} # 给最高的权限
